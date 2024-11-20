@@ -9,7 +9,7 @@
 #' @param assay Name of assay to use, defaults to the active assay. The parameter
 #' works when a seurat object is input. If input assay object, the assay object
 #' will regarded as RNA assay and included in output Seurat object.
-#' @param slot Default data. The parameter works if a seurat object is input.
+#' @param layer Default data. The parameter works if a seurat object is input.
 #' AddModuleScore, VAM should be data, and VISION, gficf, pagoda2 should be counts.
 #' @param min.cells The minimum detected cells per gene, default 3. The parameter
 #' worsk if a scRNA-seq matrix is input.
@@ -232,7 +232,7 @@
 #' library(irGSEA)
 #' data("pbmc3k.final")
 #' pbmc3k.final <- SeuratObject::UpdateSeuratObject(pbmc3k.final)
-#' pbmc3k.final <- irGSEA.score(object = pbmc3k.final, assay = "RNA", slot = "data",
+#' pbmc3k.final <- irGSEA.score(object = pbmc3k.final, assay = "RNA", layer = "data",
 #' msigdb = T, species = "Homo sapiens", category = "H", geneid = "symbol",
 #' method = c("AUCell", "UCell", "singscore", "ssgsea"), kcdf = 'Gaussian')
 #'
@@ -241,10 +241,10 @@
 #' data("pbmc3k.final")
 #' pbmc3k.final <- SeuratObject::UpdateSeuratObject(pbmc3k.final)
 #' pbmc3k.final2 <- CreateSeuratObject(counts = CreateAssay5Object(
-#' GetAssayData(pbmc3k.final, assay = "RNA", slot = "counts")),
+#' GetAssayData(pbmc3k.final, assay = "RNA", layer = "counts")),
 #' meta.data = pbmc3k.final[[]])
 #' pbmc3k.final2 <- NormalizeData(pbmc3k.final2)
-#' pbmc3k.final2 <- irGSEA.score(object = pbmc3k.final2, assay = "RNA", slot = "data",
+#' pbmc3k.final2 <- irGSEA.score(object = pbmc3k.final2, assay = "RNA", layer = "data",
 #' msigdb = T, species = "Homo sapiens", category = "H", geneid = "symbol",
 #' method = c("AUCell", "UCell", "singscore", "ssgsea"), kcdf = 'Gaussian')
 #'
@@ -252,17 +252,17 @@
 #' data("pbmc3k.final")
 #' pbmc3k.final <- SeuratObject::UpdateSeuratObject(pbmc3k.final)
 #' pbmc3k.final3 <- CreateAssay5Object(counts = GetAssayData(pbmc3k.final,
-#' assay = "RNA", slot = "counts"))
+#' assay = "RNA", layer = "counts"))
 #' pbmc3k.final3 <- NormalizeData(pbmc3k.final3)
-#' pbmc3k.final3 <- irGSEA.score(object = pbmc3k.final3, assay = "RNA", slot = "data",
+#' pbmc3k.final3 <- irGSEA.score(object = pbmc3k.final3, assay = "RNA", layer = "data",
 #' msigdb = T, species = "Homo sapiens", category = "H", geneid = "symbol",
 #' method = c("AUCell", "UCell", "singscore", "ssgsea"), kcdf = 'Gaussian')
 
 #'
 #' # Data.fram, Matrix, or dgmatrix
 #' pbmc3k.final2 <- irGSEA.score(object = GetAssayData(pbmc3k.final,
-#' assay = "RNA", slot = "counts"),
-#' assay = "RNA", slot = "data", min.cells = 3, min.feature = 0,
+#' assay = "RNA", layer = "counts"),
+#' assay = "RNA", layer = "data", min.cells = 3, min.feature = 0,
 #' method = c("AUCell", "UCell", "singscore", "ssgsea"), kcdf = 'Poisson')
 #'
 #' # custom geneset
@@ -272,12 +272,12 @@
 #' markers$Tcell_CD4 <- c("CD4","CD40LG")
 #' markers$Tcell_CD8 <- c("CD8A","CD8B")
 #' markers$Tcell_Treg <- c("FOXP3","IL2RA")
-#' pbmc3k.final3 <- irGSEA.score(object = pbmc3k.final, assay = "RNA", slot = "data",
+#' pbmc3k.final3 <- irGSEA.score(object = pbmc3k.final, assay = "RNA", layer = "data",
 #' custom = T, geneset = markers, method = c("AUCell", "UCell", "singscore", "ssgsea"),
 #' kcdf = 'Gaussian')
 #' }
 #'
-irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
+irGSEA.score <- function(object = NULL, assay = NULL, layer = "data",
                          min.cells = 3, min.feature = 0,
                          seeds = 123, ncores = 4,
                          custom = F, geneset = NULL, geneset.weight = NULL,
@@ -314,7 +314,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
     object <- SeuratObject::UpdateSeuratObject(object)
     if (purrr::is_null(assay)){assay <- Seurat::DefaultAssay(object)}
-    my.matrix <- SeuratObject::GetAssayData(object, assay = assay, slot = slot)
+    my.matrix <- SeuratObject::GetAssayData(object, assay = assay, layer = layer)
 
   }
 
@@ -325,7 +325,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
                                                assay = "RNA",
                                                min.cells = min.cells,
                                                min.feature = min.feature)
-    my.matrix <- SeuratObject::GetAssayData(object, assay = "RNA", slot = "counts")
+    my.matrix <- SeuratObject::GetAssayData(object, assay = "RNA", layer = "counts")
     assay = "RNA"
   }
 
@@ -337,7 +337,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
                                                assay = "RNA",
                                                min.cells = min.cells,
                                                min.feature = min.feature)
-    my.matrix <- SeuratObject::GetAssayData(object, assay = "RNA", slot = slot)
+    my.matrix <- SeuratObject::GetAssayData(object, assay = "RNA", layer = layer)
     assay = "RNA"
   }
 
@@ -509,8 +509,8 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
   ## VAM
   if ("VAM" %in% method) {
-    if (!(assay %in% c("RNA", "SCT")) & (slot %in% c("data"))) {
-      stop("VAM only support assay (RNA or SCT) and slot (data).")
+    if (!(assay %in% c("RNA", "SCT")) & (layer %in% c("data"))) {
+      stop("VAM only support assay (RNA or SCT) and layer (data).")
     }
     # install package from CRAN
     if (!requireNamespace("VAM", quietly = TRUE)) {
@@ -521,8 +521,8 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
   ## VISION
   if ("VISION" %in% method) {
-    if (! slot %in% c("counts")) {
-      stop("VISION only support slot (counts).")
+    if (! layer %in% c("counts")) {
+      stop("VISION only support layer (counts).")
     }
 
     # install package from Github
@@ -548,8 +548,8 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
   # pagoda2
   if ("pagoda2" %in% method) {
 
-    if (! slot %in% c("counts")) {
-      stop("pagoda2 only support slot (counts).")
+    if (! layer %in% c("counts")) {
+      stop("pagoda2 only support layer (counts).")
     }
 
     # install.package from CRAN
@@ -627,7 +627,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
     }
     aucell.scores.list <- do.call(cbind, aucell.scores.list)
     object[["AUCell"]] <- SeuratObject::CreateAssayObject(counts = aucell.scores.list)
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = aucell.scores.list, assay = "AUCell")
     if (utils::packageVersion("Seurat") >= "5.0.0") {
       object[["AUCell"]]$counts <- NULL}
@@ -655,7 +655,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
                                                  force.gc = T)
     colnames(ucell.scores) <- stringr::str_remove(colnames(ucell.scores), pattern = "_UCell")
     object[["UCell"]] <- SeuratObject::CreateAssayObject(counts = t(ucell.scores))
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = t(ucell.scores), assay = "UCell")
     if (utils::packageVersion("Seurat") >= "5.0.0") {
       object[["UCell"]]$counts <- NULL}
@@ -725,7 +725,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
     }
     singscore.scores.list <- do.call(rbind, singscore.scores.list)
     object[["singscore"]] <- SeuratObject::CreateAssayObject(counts = t(singscore.scores.list))
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = t(singscore.scores.list), assay = "singscore")
     if (utils::packageVersion("Seurat") >= "5.0.0") {
       object[["singscore"]]$counts <- NULL}
@@ -772,7 +772,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
     }
     ssgsea.scores.list <- do.call(cbind, ssgsea.scores.list)
     object[["ssgsea"]] <- SeuratObject::CreateAssayObject(counts = ssgsea.scores.list)
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = as.matrix(ssgsea.scores.list), assay = "ssgsea")
     if (utils::packageVersion("Seurat") >= "5.0.0") {
       object[["ssgsea"]]$counts <- NULL}
@@ -902,7 +902,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
               "Thus, the gene set is filtered.")
     }
     object[["JASMINE"]] <- SeuratObject::CreateAssayObject(counts = t(jasmine.scores.list))
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = t(jasmine.scores.list), assay = "JASMINE")
     if (utils::packageVersion("Seurat") >= "5.0.0") {
       object[["JASMINE"]]$counts <- NULL}
@@ -921,7 +921,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
     message("Calculate VAM scores")
     h.gsets.list.vam <- h.gsets.list %>% purrr::discard(.p = function(x){all(stringr::str_detect(x, pattern = "\\+$|-$"))})
 
-    if ((assay %in% c("RNA", "SCT")) & (slot %in% c("data"))) {
+    if ((assay %in% c("RNA", "SCT")) & (layer %in% c("data"))) {
 
       # install package from CRAN
       if (!requireNamespace("VAM", quietly = TRUE)) {
@@ -938,9 +938,9 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
                                    gamma = T,
                                    sample.cov = F,
                                    return.dist = F)
-      object[["VAM"]] <- SeuratObject::CreateAssayObject(counts = SeuratObject::GetAssayData(object2, assay = "VAMcdf", slot = "counts"))
-      object <- SeuratObject::SetAssayData(object, slot = "scale.data",
-                                           new.data = as.matrix(SeuratObject::GetAssayData(object2, assay = "VAMcdf", slot = "counts")),
+      object[["VAM"]] <- SeuratObject::CreateAssayObject(counts = SeuratObject::GetAssayData(object2, assay = "VAMcdf", layer = "counts"))
+      object <- SeuratObject::SetAssayData(object, layer = "scale.data",
+                                           new.data = as.matrix(SeuratObject::GetAssayData(object2, assay = "VAMcdf", layer = "counts")),
                                            assay = "VAM")
       if (utils::packageVersion("Seurat") >= "5.0.0") {
         object[["VAM"]]$counts <- NULL}
@@ -951,7 +951,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
 
     }else{
-      message("VAM needs normalized counts. And assay should be RNA or SCT, slot should be data.")
+      message("VAM needs normalized counts. And assay should be RNA or SCT, layer should be data.")
     }
 
   }}, error = function(e) {
@@ -999,7 +999,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
     object[["scSE"]] <- SeuratObject::CreateAssayObject(counts = t(scSE.scores.list))
 
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = t(scSE.scores.list),
                                          assay = "scSE")
     if (utils::packageVersion("Seurat") >= "5.0.0") {
@@ -1016,7 +1016,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
 
   #### 11.calculate VISION scores ####
-  tryCatch({if (("VISION" %in% method) & (slot %in% c("counts"))) {
+  tryCatch({if (("VISION" %in% method) & (layer %in% c("counts"))) {
     message("Calculate VISION scores")
 
     # install package from Github
@@ -1099,7 +1099,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
     sigScores <- VISION::getSignatureScores(vision.obj)
 
     object[["VISION"]] <- SeuratObject::CreateAssayObject(counts = t(sigScores))
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = t(sigScores),
                                          assay = "VISION")
     if (utils::packageVersion("Seurat") >= "5.0.0") {
@@ -1199,7 +1199,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
         tibble::column_to_rownames(var = "condition")
 
       object[["wmean"]] <- SeuratObject::CreateAssayObject(counts = t(acts))
-      object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+      object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                            new.data = t(acts),
                                            assay = "wmean")
       if (utils::packageVersion("Seurat") >= "5.0.0") {
@@ -1231,7 +1231,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
         tibble::column_to_rownames(var = "condition")
 
       object[["wsum"]] <- SeuratObject::CreateAssayObject(counts = t(acts))
-      object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+      object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                            new.data = t(acts),
                                            assay = "wsum")
       if (utils::packageVersion("Seurat") >= "5.0.0") {
@@ -1261,7 +1261,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
         tibble::column_to_rownames(var = "condition")
 
       object[["mdt"]] <- SeuratObject::CreateAssayObject(counts = t(acts))
-      object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+      object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                            new.data = t(acts),
                                            assay = "mdt")
       if (utils::packageVersion("Seurat") >= "5.0.0") {
@@ -1319,7 +1319,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
       }
       acts <- do.call(cbind, viper.scores.list)
       object[["viper"]] <- SeuratObject::CreateAssayObject(counts = acts)
-      object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+      object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                            new.data = acts,
                                            assay = "viper")
       if (utils::packageVersion("Seurat") >= "5.0.0") {
@@ -1365,7 +1365,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
       # convert seurat to h5ad
       # seurat2scanpy <- function(x){
-      #   temp <- SeuratObject::CreateSeuratObject(counts = x, slot = "counts")
+      #   temp <- SeuratObject::CreateSeuratObject(counts = x, layer = "counts")
       #   SeuratDisk::SaveH5Seurat(temp, filename = "./temp.h5Seurat", overwrite = T)
       #   SeuratDisk::Convert("./temp.h5Seurat", dest = "h5ad", overwrite = T)
       #
@@ -1374,18 +1374,18 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
       # seurat2scanpy(my.matrix)
 
       # convert seurat to h5ad
-      seurat2scanpy.file <- function(object, slot, assay){
-        if (slot == "counts") {
+      seurat2scanpy.file <- function(object, layer, assay){
+        if (layer == "counts") {
           temp <- Seurat::DietSeurat(object, counts = TRUE, data = FALSE,
                                      scale.data = FALSE,
                                      assays = assay)
         }
-        if (slot == "data") {
+        if (layer == "data") {
           temp <- Seurat::DietSeurat(object, counts = FALSE, data = TRUE,
                                      scale.data = FALSE,
                                      assays = assay)
         }
-        if (slot == "scale.data") {
+        if (layer == "scale.data") {
           temp <- Seurat::DietSeurat(object, counts = FALSE, data = FALSE,
                                      scale.data = TRUE,
                                      assays = assay)
@@ -1397,7 +1397,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
       }
 
-      seurat2scanpy.file(object, slot, assay)
+      seurat2scanpy.file(object, layer, assay)
 
 
       readr::write_csv(net, "./geneset.csv")
@@ -1438,7 +1438,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
         colnames(acts)[1] <- "cell"
         acts <- acts %>% tibble::column_to_rownames(var = "cell")
         object[["GSVApy"]] <- SeuratObject::CreateAssayObject(counts = t(acts))
-        object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+        object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                              new.data = t(acts),
                                              assay = "GSVApy")
         if (utils::packageVersion("Seurat") >= "5.0.0") {
@@ -1486,18 +1486,18 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
 
       # convert seurat to h5ad
-      seurat2scanpy.file <- function(object, slot, assay){
-        if (slot == "counts") {
+      seurat2scanpy.file <- function(object, layer, assay){
+        if (layer == "counts") {
           temp <- Seurat::DietSeurat(object, counts = TRUE, data = FALSE,
                                      scale.data = FALSE,
                                      assays = assay)
         }
-        if (slot == "data") {
+        if (layer == "data") {
           temp <- Seurat::DietSeurat(object, counts = FALSE, data = TRUE,
                                      scale.data = FALSE,
                                      assays = assay)
         }
-        if (slot == "scale.data") {
+        if (layer == "scale.data") {
           temp <- Seurat::DietSeurat(object, counts = FALSE, data = FALSE,
                                      scale.data = TRUE,
                                      assays = assay)
@@ -1509,7 +1509,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
       }
 
-      seurat2scanpy.file(object, slot, assay)
+      seurat2scanpy.file(object, layer, assay)
 
 
       readr::write_csv(net, "./geneset.csv")
@@ -1550,7 +1550,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
         colnames(acts)[1] <- "cell"
         acts <- acts %>% tibble::column_to_rownames(var = "cell")
         object[["viperpy"]] <- SeuratObject::CreateAssayObject(counts = t(acts))
-        object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+        object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                              new.data = t(acts),
                                              assay = "viperpy")
         if (utils::packageVersion("Seurat") >= "5.0.0") {
@@ -1600,8 +1600,8 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
       devtools::install_github("zdebruine/RcppML", force =T)
     }
 
-    if (! slot %in% c("counts")) {
-      stop("gficf only support slot (counts).")
+    if (! layer %in% c("counts")) {
+      stop("gficf only support layer (counts).")
     }
 
     # prepare data
@@ -1785,7 +1785,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
                         nt = ncores)
 
     object[["gficf"]] <- SeuratObject::CreateAssayObject(counts = Matrix::t(data$scgsea$x))
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = as.matrix(Matrix::t(data$scgsea$x)),
                                          assay = "gficf")
     if (utils::packageVersion("Seurat") >= "5.0.0") {
@@ -1828,7 +1828,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
     GSVA.scores.list <- do.call(cbind, GSVA.scores.list)
     object[["GSVA"]] <- SeuratObject::CreateAssayObject(counts = GSVA.scores.list)
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = as.matrix(GSVA.scores.list), assay = "GSVA")
     if (utils::packageVersion("Seurat") >= "5.0.0") {
       object[["GSVA"]]$counts <- NULL}
@@ -1871,7 +1871,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
     zscore.scores.list <- do.call(cbind, zscore.scores.list)
     object[["zscore"]] <- SeuratObject::CreateAssayObject(counts = zscore.scores.list)
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = as.matrix(zscore.scores.list),
                                          assay = "zscore")
     if (utils::packageVersion("Seurat") >= "5.0.0") {
@@ -1915,7 +1915,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
     plage.scores.list <- do.call(cbind, plage.scores.list)
     object[["plage"]] <- SeuratObject::CreateAssayObject(counts = plage.scores.list)
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = as.matrix(plage.scores.list), assay = "plage")
     if (utils::packageVersion("Seurat") >= "5.0.0") {
       object[["plage"]]$counts <- NULL}
@@ -1970,18 +1970,18 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
       dplyr::pull(python)
 
     # convert seurat to h5ad
-    seurat2scanpy.file <- function(object, slot, assay){
-      if (slot == "counts") {
+    seurat2scanpy.file <- function(object, layer, assay){
+      if (layer == "counts") {
         temp <- Seurat::DietSeurat(object, counts = TRUE, data = FALSE,
                                    scale.data = FALSE,
                                    assays = assay)
       }
-      if (slot == "data") {
+      if (layer == "data") {
         temp <- Seurat::DietSeurat(object, counts = FALSE, data = TRUE,
                                    scale.data = FALSE,
                                    assays = assay)
       }
-      if (slot == "scale.data") {
+      if (layer == "scale.data") {
         temp <- Seurat::DietSeurat(object, counts = FALSE, data = FALSE,
                                    scale.data = TRUE,
                                    assays = assay)
@@ -1993,7 +1993,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
     }
 
-    seurat2scanpy.file(object, slot, assay)
+    seurat2scanpy.file(object, layer, assay)
 
 
     for (i in seq_along(h.gsets.list.ssgsea.py)) {
@@ -2042,7 +2042,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
 
     object[["ssGSEApy"]] <- SeuratObject::CreateAssayObject(counts = as.matrix(acts))
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = as.matrix(acts),
                                          assay = "ssGSEApy")
 
@@ -2065,7 +2065,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
 
   #### 18.calculate AddModuleScore ####
-  tryCatch({if (("AddModuleScore" %in% method) & (slot %in% c("data"))) {
+  tryCatch({if (("AddModuleScore" %in% method) & (layer %in% c("data"))) {
     message("Calculate AddModuleScore scores")
     h.gsets.list.AddModuleScore <- h.gsets.list %>% purrr::discard(.p = function(x){all(stringr::str_detect(x, pattern = "\\+$|-$"))})
 
@@ -2087,7 +2087,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
 
     object[["AddModuleScore"]] <- SeuratObject::CreateAssayObject(counts = score)
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = score,
                                          assay = "AddModuleScore")
     if (utils::packageVersion("Seurat") >= "5.0.0") {
@@ -2107,7 +2107,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
 
   #### 19.calculate pagoda2 scores ####
-  tryCatch({if (("pagoda2" %in% method) & (slot %in% c("counts"))) {
+  tryCatch({if (("pagoda2" %in% method) & (layer %in% c("counts"))) {
     message("Calculate pagoda2 scores")
     h.gsets.list.pagoda2 <- h.gsets.list %>% purrr::discard(.p = function(x){all(stringr::str_detect(x, pattern = "\\+$|-$"))})
     # install.package from CRAN
@@ -2377,7 +2377,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
     }
 
     object[["pagoda2"]] <- SeuratObject::CreateAssayObject(counts = score)
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = score,
                                          assay = "pagoda2")
     if (utils::packageVersion("Seurat") >= "5.0.0") {
@@ -2471,7 +2471,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
 
     object[["Sargent"]] <- SeuratObject::CreateAssayObject(counts = acts)
-    object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+    object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                          new.data = acts,
                                          assay = "Sargent")
     if (utils::packageVersion("Seurat") >= "5.0.0") {
@@ -2506,8 +2506,8 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
       message("Add the new geneset scoring matrix based on the original geneset scoring matrix")
       for (i in SeuratObject::Assays(object.bak)[SeuratObject::Assays(object.bak) %in% method]) {
         print(i)
-        object.data <- SeuratObject::GetAssayData(object = object[[i]], slot = "scale.data")
-        object.bak.data <- SeuratObject::GetAssayData(object = object.bak[[i]], slot = "scale.data")
+        object.data <- SeuratObject::GetAssayData(object = object[[i]], layer = "scale.data")
+        object.bak.data <- SeuratObject::GetAssayData(object = object.bak[[i]], layer = "scale.data")
         name.intersect <- intersect(rownames(object.data), rownames(object.bak.data))
 
         # if overwrite, or renames the same geneset
@@ -2553,7 +2553,7 @@ irGSEA.score <- function(object = NULL, assay = NULL, slot = "data",
 
 
         object[[i]] <- SeuratObject::CreateAssayObject(counts = as.matrix(object.data.merge))
-        object <- SeuratObject::SetAssayData(object, slot = "scale.data",
+        object <- SeuratObject::SetAssayData(object, layer = "scale.data",
                                              new.data = as.matrix(object.data.merge),
                                              assay = i)
         if (utils::packageVersion("Seurat") >= "5.0.0") {
